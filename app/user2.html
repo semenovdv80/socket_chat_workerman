@@ -1,0 +1,59 @@
+<html>
+<head>
+    <title>TODO supply a title</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+<div>CHAT ONLINE</div>
+<div id="chat-window"></div>
+<form action="">
+<input type="text" id="msg-input">
+<input type="submit" id="send" value="Send">
+</form>
+<script>
+    var socket = new WebSocket("ws://localhost:8000?uid=555");
+    var button = document.getElementById('send');
+
+    button.onclick = function(e){
+        e.preventDefault();
+        var input = document.getElementById('msg-input');
+        var message = input.value;
+        input.value = '';
+        socket.send(JSON.stringify({uid:333, msg:message}));
+    };
+
+    socket.onopen = function() {
+
+        console.log("Соединение установлено.");
+    };
+
+    socket.onclose = function(event) {
+        if (event.wasClean) {
+            console.log('Соединение закрыто чисто');
+        } else {
+            console.log('Обрыв соединения'); // например, "убит" процесс сервера
+        }
+        alert('Код: ' + event.code + ' причина: ' + event.reason);
+    };
+
+    socket.onmessage = function(event) {
+        var chatwind = document.getElementById('chat-window');
+        var innerDiv = document.createElement('div');
+        innerDiv.append(event.data);
+        chatwind.append(innerDiv);
+
+        console.log("Получены данные " + event.data);
+    };
+
+    socket.onerror = function(error) {
+        console.log("Ошибка " + error.message);
+    };
+    /*
+    var timerId = setInterval(function() {
+        socket.send(JSON.stringify({uid:333, msg:'hello from 333'}));
+    }, 4000);
+    */
+</script>
+</body>
+</html>
